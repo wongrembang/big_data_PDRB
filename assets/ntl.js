@@ -156,10 +156,11 @@ function renderTrendChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: { top: 16 } },
       plugins: { legend: { display: false } },
       scales: {
         x: { ticks: { autoSkip: true, maxTicksLimit: 14, maxRotation: 45 } },
-        y: { title: { display: true, text: "NTL relatif" } },
+        y: { title: { display: true, text: "NTL relatif" }, beginAtZero: true },
       }
     }
   });
