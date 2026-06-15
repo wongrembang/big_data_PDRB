@@ -65,8 +65,167 @@
 
   <div class="section">
     <div class="section-head">
-      <h2>Tentang proyek ini</h2>
+      <h2>Update data</h2>
+      <span class="note" id="lastUpdateLabel"></span>
     </div>
+    <div class="card" id="updatePanel">
+
+      <!-- Status bar -->
+      <div id="updateStatus" style="display:none;margin-bottom:14px;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px"></div>
+
+      <!-- Token setup (muncul jika belum ada token) -->
+      <div id="tokenSetup">
+        <p style="font-size:14px;color:var(--ink-soft);margin-top:0">
+          Untuk memicu update otomatis dari dashboard, masukkan
+          <strong style="color:var(--ink)">GitHub Personal Access Token</strong> dengan
+          scope <code>repo</code> (atau <code>workflow</code>). Token disimpan hanya
+          di browser ini (localStorage) — tidak dikirim ke server mana pun selain
+          GitHub API langsung.
+        </p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input type="password" id="patInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+            style="flex:1;min-width:260px;font-family:var(--font-mono);font-size:13px">
+          <button onclick="savePAT()" style="padding:8px 16px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:14px">
+            Simpan token
+          </button>
+          <a href="https://github.com/settings/tokens/new?scopes=workflow&description=SIMAK+Rembang"
+            target="_blank" rel="noopener"
+            style="font-size:13px;color:var(--navy)">Buat token baru ↗</a>
+        </div>
+      </div>
+
+      <!-- Panel update (muncul setelah token tersimpan) -->
+      <div id="updateControls" style="display:none">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+          <div>
+            <div style="font-size:12px;color:var(--ink-soft);margin-bottom:4px">Akun/Repo</div>
+            <code id="repoLabel" style="font-size:13px">wongrembang/big_data_PDRB</code>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button onclick="triggerUpdate(false)"
+              style="padding:9px 20px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:14px;font-weight:600">
+              ▶ Jalankan update penuh
+            </button>
+            <button onclick="triggerUpdate(true)"
+              style="padding:9px 16px;background:#fff;color:var(--navy);border:1px solid var(--line);border-radius:var(--radius-sm);cursor:pointer;font-size:13px">
+              ▶ Skip GEE (GFW+PDRB saja)
+            </button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-soft);display:flex;gap:16px;flex-wrap:wrap">
+          <span>⏱ Estimasi: update penuh ~60 menit, skip GEE ~10 menit</span>
+          <a href="https://github.com/wongrembang/big_data_PDRB/actions" target="_blank"
+            rel="noopener" style="color:var(--navy)">Pantau progres di GitHub Actions ↗</a>
+          <button onclick="clearPAT()"
+            style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:12px;padding:0;text-decoration:underline">
+            Hapus token tersimpan
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const REPO = "wongrembang/big_data_PDRB";
+    const WORKFLOW_ID = "update-data.yml";
+    const LS_KEY = "simak_gh_pat";
+
+    function showStatus(msg, type) {
+      const el = document.getElementById("updateStatus");
+      el.style.display = "block";
+      el.style.background = type === "ok" ? "#EAF3DE" : type === "err" ? "#FCEBEB" : "#FBF8F0";
+      el.style.color = type === "ok" ? "#3B6D11" : type === "err" ? "#A32D2D" : "#633806";
+      el.style.border = `1px solid ${type === "ok" ? "#C0DD97" : type === "err" ? "#F7C1C1" : "#FAC775"}`;
+      el.textContent = msg;
+    }
+
+    function savePAT() {
+      const val = document.getElementById("patInput").value.trim();
+      if (!val.startsWith("ghp_") && !val.startsWith("github_pat_")) {
+        showStatus("Format token tidak valid. Harus dimulai dengan ghp_ atau github_pat_", "err");
+        return;
+      }
+      localStorage.setItem(LS_KEY, val);
+      renderUpdatePanel();
+      showStatus("Token tersimpan di browser. Siap untuk trigger update.", "ok");
+    }
+
+    function clearPAT() {
+      if (!confirm("Hapus token dari browser?")) return;
+      localStorage.removeItem(LS_KEY);
+      renderUpdatePanel();
+    }
+
+    async function triggerUpdate(skipGee) {
+      const pat = localStorage.getItem(LS_KEY);
+      if (!pat) { showStatus("Token belum tersimpan.", "err"); return; }
+
+      showStatus("Mengirim permintaan ke GitHub Actions...", "info");
+      try {
+        const res = await fetch(
+          `https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`,
+          {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${pat}`,
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              ref: "main",
+              inputs: { skip_gee: skipGee ? "true" : "false" }
+            })
+          }
+        );
+        if (res.status === 204) {
+          showStatus(
+            `✓ Workflow berhasil dipicu! ${skipGee ? "Mode: Skip GEE (~10 menit)" : "Mode: Update penuh (~60 menit)"}. Pantau progres di GitHub Actions.`,
+            "ok"
+          );
+        } else if (res.status === 401) {
+          showStatus("Token tidak valid atau sudah expired. Buat token baru dan simpan ulang.", "err");
+        } else if (res.status === 404) {
+          showStatus("Workflow tidak ditemukan. Pastikan file .github/workflows/update-data.yml sudah ter-push ke repo.", "err");
+        } else {
+          const body = await res.json().catch(() => ({}));
+          showStatus(`Error ${res.status}: ${body.message || "tidak diketahui"}`, "err");
+        }
+      } catch (e) {
+        showStatus(`Gagal terhubung ke GitHub API: ${e.message}`, "err");
+      }
+    }
+
+    function renderUpdatePanel() {
+      const pat = localStorage.getItem(LS_KEY);
+      document.getElementById("tokenSetup").style.display = pat ? "none" : "block";
+      document.getElementById("updateControls").style.display = pat ? "block" : "none";
+    }
+
+    // Set label kapan data.js terakhir dimodifikasi (tidak bisa dari static site,
+    // tapi bisa fetch commit info dari GitHub API)
+    async function fetchLastUpdate() {
+      try {
+        const res = await fetch(
+          `https://api.github.com/repos/${REPO}/commits?path=assets%2Fdata.js&per_page=1`,
+          { headers: { "Accept": "application/vnd.github+json" } }
+        );
+        if (!res.ok) return;
+        const commits = await res.json();
+        if (commits.length) {
+          const date = new Date(commits[0].commit.author.date);
+          document.getElementById("lastUpdateLabel").textContent =
+            "Data terakhir diperbarui: " + date.toLocaleDateString("id-ID", {
+              day: "numeric", month: "long", year: "numeric"
+            });
+        }
+      } catch (_) {}
+    }
+
+    renderUpdatePanel();
+    fetchLastUpdate();
+  </script>
     <div class="card" style="font-size:14px;color:var(--ink-soft)">
       <p style="margin-top:0">
         PDRB resmi hanya tersedia di tingkat kabupaten/kota dan membutuhkan survei yang mahal serta
