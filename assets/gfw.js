@@ -111,14 +111,16 @@ new Chart(document.getElementById("geartypeChart"), {
   }
 });
 
-// Custom legend for geartype
+// Custom legend for geartype - below chart, wrapped properly
 const legendHtml = geartypes.map(g => `
-  <span style="display:flex;align-items:center;gap:4px">
-    <span style="width:10px;height:10px;border-radius:2px;background:${GEARTYPE_COLORS[g] || '#888780'}"></span>${g}
+  <span style="display:inline-flex;align-items:center;gap:4px;white-space:nowrap;margin:2px 6px 2px 0">
+    <span style="display:inline-block;width:10px;height:10px;border-radius:2px;flex-shrink:0;background:${GEARTYPE_COLORS[g] || '#888780'}"></span>${g}
   </span>
 `).join("");
-document.querySelector("#geartypeChart").insertAdjacentHTML("afterend",
-  `<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--ink-soft)">${legendHtml}</div>`);
+const legendDiv = document.createElement("div");
+legendDiv.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;font-size:12px;color:var(--ink-soft);line-height:1.8";
+legendDiv.innerHTML = legendHtml;
+document.getElementById("geartypeChart").parentNode.insertAdjacentElement("afterend", legendDiv);
 
 // ---------------------------------------------------------------------------
 // Vessel table
