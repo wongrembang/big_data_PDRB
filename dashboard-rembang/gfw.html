@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perikanan Tangkap &mdash; SIMAK Rembang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="topbar"></div>
+
+<div class="page">
+  <div class="hero">
+    <div class="eyebrow" style="color:var(--gfw)">Global Fishing Watch &middot; AIS</div>
+    <h1>Aktivitas kapal nelayan di perairan Rembang</h1>
+    <p>
+      Data ini berasal dari sinyal AIS kapal yang diproses Global Fishing Watch menjadi
+      perkiraan <em>apparent fishing effort</em> (jam aktivitas penangkapan ikan). Area yang
+      dipantau adalah perairan di depan pesisir Kabupaten Rembang (Laut Jawa bagian utara).
+    </p>
+  </div>
+
+  <div class="note-box" style="margin-bottom:24px">
+    <strong>Catatan penting sebelum membaca data ini.</strong> Sejak Juni 2024, jumlah kapal
+    yang terdeteksi melonjak tajam (dari 1&ndash;4 menjadi 10&ndash;37 kapal per bulan) dan
+    bertahan di level baru tersebut. Pola &ldquo;melonjak lalu mendatar&rdquo; ini lebih
+    konsisten dengan <strong>peningkatan adopsi AIS oleh kapal nelayan</strong>
+    (mengikuti kebijakan pemantauan kapal perikanan), bukan lonjakan aktivitas ekonomi riil.
+    Data sebelum pertengahan 2024 sebaiknya tidak dibandingkan langsung dengan data sesudahnya.
+    Karena periode representatif baru sekitar dua tahun, data ini <strong>belum dikorelasikan
+    dengan PDRB Perikanan</strong>.
+  </div>
+
+  <!-- ============================== TREN BULANAN ============================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Tren bulanan: jam aktivitas dan jumlah kapal</h2>
+      <span class="note">2022&ndash;2026</span>
+    </div>
+    <div class="grid cols-3" style="margin-bottom:16px">
+      <div class="metric">
+        <div class="label">Total jam tercatat (semua periode)</div>
+        <div class="value" id="metricTotalHours">&ndash;</div>
+      </div>
+      <div class="metric">
+        <div class="label">Kapal unik terdeteksi (semua periode)</div>
+        <div class="value" id="metricTotalVessels">&ndash;</div>
+      </div>
+      <div class="metric">
+        <div class="label">Rata-rata kapal/bulan, sejak Jun 2024</div>
+        <div class="value" id="metricAvgVessels">&ndash;</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="position:relative;width:100%;height:280px">
+        <canvas id="trendChart" role="img" aria-label="Grafik dua sumbu menunjukkan total jam aktivitas penangkapan ikan dan jumlah kapal unik per bulan, 2022 hingga 2026, dengan lonjakan tajam mulai Juni 2024">
+          Grafik tren jam aktivitas dan jumlah kapal per bulan.
+        </canvas>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--ink-soft)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--gfw)"></span>Total jam penangkapan (kiri)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:var(--navy);border-top:2px dashed var(--navy)"></span>Jumlah kapal unik (kanan)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================== GEARTYPE ============================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Jenis alat tangkap (geartype) yang terdeteksi</h2>
+      <span class="note">Jam aktivitas per bulan, ditumpuk per jenis alat tangkap</span>
+    </div>
+    <div class="card">
+      <div style="position:relative;width:100%;height:280px">
+        <canvas id="geartypeChart" role="img" aria-label="Grafik batang bertumpuk menunjukkan jam aktivitas penangkapan ikan per bulan, dipecah menurut jenis alat tangkap">
+          Grafik komposisi jenis alat tangkap per bulan.
+        </canvas>
+      </div>
+      <p style="font-size:12px;color:var(--ink-soft);margin-top:8px">
+        &ldquo;INCONCLUSIVE&rdquo; berarti model belum dapat menentukan jenis alat tangkap
+        secara spesifik dari pola gerak kapal&mdash;bukan berarti tidak ada aktivitas.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================== KAPAL TERATAS ============================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Kapal dengan jam aktivitas tertinggi</h2>
+      <span class="note">Akumulasi 2022&ndash;2026</span>
+    </div>
+    <div class="card">
+      <table class="rank">
+        <thead>
+          <tr>
+            <th>Nama kapal</th>
+            <th>Jenis alat tangkap utama</th>
+            <th class="num">Bulan aktif</th>
+            <th class="num">Total jam</th>
+          </tr>
+        </thead>
+        <tbody id="vesselTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/gfw.js"></script>
+</body>
+</html>

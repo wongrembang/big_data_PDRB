@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMAK Rembang &mdash; Indikator Big Data untuk Proksi PDRB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="topbar"></div>
+
+<div class="page">
+  <div class="hero">
+    <div class="eyebrow">Kabupaten Rembang &middot; Jawa Tengah</div>
+    <h1>Indikator big data sebagai proksi PDRB kewilayahan</h1>
+    <p>
+      Tiga dashboard ini menyajikan hasil eksplorasi penggunaan data satelit dan data lalu lintas
+      kapal&mdash;sumber data gratis dan terbuka&mdash;sebagai pelengkap data resmi Produk Domestik
+      Regional Bruto (PDRB) Kabupaten Rembang, terutama untuk gambaran tingkat kecamatan yang belum
+      memiliki angka PDRB resmi.
+    </p>
+  </div>
+
+  <div class="section">
+    <div class="grid cols-3">
+
+      <a class="card" href="ndvi.html" style="display:block;text-decoration:none;color:inherit;border-top:4px solid var(--ndvi)">
+        <div class="eyebrow" style="color:var(--ndvi)">NDVI &middot; Vegetasi</div>
+        <h3 style="margin:6px 0 8px;font-family:var(--font-display);font-size:19px">Kehijauan lahan pertanian</h3>
+        <p style="font-size:13px;color:var(--ink-soft);margin:0 0 12px">
+          Indeks kehijauan vegetasi dari citra Sentinel-2/Landsat, per kecamatan per triwulan,
+          2010&ndash;2026. Termasuk versi yang di-mask khusus ke lahan pertanian (ESA WorldCover),
+          dibandingkan dengan PDRB Tanaman Pangan.
+        </p>
+        <div style="font-size:12px;color:var(--ink-soft)">Korelasi growth terbaik: <strong style="color:var(--ink)">0,47</strong> (cropland-weighted)</div>
+      </a>
+
+      <a class="card" href="ntl.html" style="display:block;text-decoration:none;color:inherit;border-top:4px solid var(--ntl)">
+        <div class="eyebrow" style="color:var(--ntl)">NTL &middot; Cahaya malam</div>
+        <h3 style="margin:6px 0 8px;font-family:var(--font-display);font-size:19px">Aktivitas ekonomi relatif</h3>
+        <p style="font-size:13px;color:var(--ink-soft);margin:0 0 12px">
+          Intensitas cahaya malam (VIIRS) per kecamatan, 2014&ndash;2026, sebagai proksi tingkat
+          aktivitas ekonomi relatif antar kecamatan. Termasuk perbandingan dua periode dan
+          korelasi dengan PDRB Total.
+        </p>
+        <div style="font-size:12px;color:var(--ink-soft)">Korelasi level dengan PDRB Total: <strong style="color:var(--ink)">0,86</strong></div>
+      </a>
+
+      <a class="card" href="gfw.html" style="display:block;text-decoration:none;color:inherit;border-top:4px solid var(--gfw)">
+        <div class="eyebrow" style="color:var(--gfw)">Global Fishing Watch</div>
+        <h3 style="margin:6px 0 8px;font-family:var(--font-display);font-size:19px">Perikanan tangkap</h3>
+        <p style="font-size:13px;color:var(--ink-soft);margin:0 0 12px">
+          Aktivitas kapal nelayan ber-AIS di perairan Rembang, 2017&ndash;2026. Menunjukkan
+          lonjakan adopsi AIS sejak pertengahan 2024 &mdash; dijelaskan sebagai keterbatasan data,
+          belum dikorelasikan dengan PDRB.
+        </p>
+        <div style="font-size:12px;color:var(--ink-soft)">Periode representatif: <strong style="color:var(--ink)">2024&ndash;2026</strong></div>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Tentang proyek ini</h2>
+    </div>
+    <div class="card" style="font-size:14px;color:var(--ink-soft)">
+      <p style="margin-top:0">
+        PDRB resmi hanya tersedia di tingkat kabupaten/kota dan membutuhkan survei yang mahal serta
+        memakan waktu. Eksplorasi ini mencoba memanfaatkan jejak digital&mdash;citra satelit dan
+        data lalu lintas kapal&mdash;sebagai pelengkap, bukan pengganti, data resmi tersebut.
+      </p>
+      <p>
+        Setiap dashboard menampilkan data historis, peta perbandingan antar kecamatan, dan
+        (bila tersedia) hasil korelasi dengan data PDRB resmi Kabupaten Rembang&mdash;termasuk
+        korelasi yang lemah, karena hal tersebut juga merupakan temuan yang penting untuk
+        dipahami.
+      </p>
+      <p style="margin-bottom:0">
+        Data dapat diperbarui secara mandiri menggunakan skrip Python di folder
+        <code>scripts/</code>. Lihat <a href="https://github.com/wongrembang" target="_blank" rel="noopener">README</a>
+        untuk panduan lengkap.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="assets/shared.js"></script>
+<script>
+  mountTopbar("index.html");
+  mountFooter();
+</script>
+</body>
+</html>

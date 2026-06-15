@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDVI &mdash; SIMAK Rembang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="topbar"></div>
+
+<div class="page">
+  <div class="hero">
+    <div class="eyebrow" style="color:var(--ndvi)">NDVI &middot; Normalized Difference Vegetation Index</div>
+    <h1>Kehijauan lahan sebagai proksi sektor pertanian</h1>
+    <p>
+      NDVI mengukur kerapatan vegetasi dari citra satelit (Sentinel-2 sejak 2017, Landsat 7/8
+      untuk periode sebelumnya). Peta menunjukkan kondisi per kecamatan pada periode terpilih;
+      grafik menunjukkan tren historis dan perbandingan dengan PDRB sublapangan Tanaman Pangan.
+    </p>
+  </div>
+
+  <!-- ============================== PETA ============================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Peta NDVI per kecamatan</h2>
+      <span class="note" id="periodLabel"></span>
+    </div>
+    <div class="card">
+      <div class="controls">
+        <label>Versi NDVI</label>
+        <div class="btn-group" id="ndviModeBtns">
+          <button data-mode="unmasked" class="active">Seluruh wilayah</button>
+          <button data-mode="cropland">Hanya lahan pertanian</button>
+        </div>
+        <label style="margin-left:12px">Periode</label>
+        <input type="range" id="periodSlider" min="0" max="0" value="0" style="flex:1;min-width:160px">
+      </div>
+      <div class="map-wrap">
+        <div>
+          <div id="map"></div>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div>
+          <div class="tooltip-box" id="tooltip">Arahkan kursor ke kecamatan untuk melihat nilai</div>
+          <table class="rank" style="margin-top:12px">
+            <thead><tr><th>Kecamatan</th><th class="num">NDVI</th></tr></thead>
+            <tbody id="rankTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================== TREN ============================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Tren NDVI per kecamatan, 2010&ndash;2026</h2>
+      <span class="note">Garis putus-putus menandai pergantian sensor satelit</span>
+    </div>
+    <div class="card">
+      <div class="controls">
+        <label>Kecamatan</label>
+        <select id="kecSelect"></select>
+      </div>
+      <div style="position:relative;width:100%;height:280px">
+        <canvas id="trendChart" role="img" aria-label="Grafik garis NDVI triwulanan kecamatan terpilih dari 2010 hingga 2026">
+          Grafik tren NDVI triwulanan.
+        </canvas>
+      </div>
+      <p style="font-size:12px;color:var(--ink-soft);margin-top:8px">
+        Sumber data berubah seiring waktu: Landsat 7 (2010&ndash;2012), Landsat 8 (2013&ndash;2016),
+        Sentinel-2 (2017&ndash;sekarang). Resolusi dan kalibrasi sedikit berbeda antar sensor,
+        sehingga fluktuasi tajam di sekitar tahun transisi perlu dibaca dengan hati-hati.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================== KORELASI ============================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Perbandingan dengan PDRB Tanaman Pangan</h2>
+    </div>
+    <div class="grid cols-3" style="margin-bottom:16px">
+      <div class="metric">
+        <div class="label">Korelasi level &mdash; NDVI seluruh wilayah</div>
+        <div class="value">0,29</div>
+      </div>
+      <div class="metric">
+        <div class="label">Korelasi growth &mdash; NDVI lahan pertanian</div>
+        <div class="value">0,47</div>
+      </div>
+      <div class="metric">
+        <div class="label">Periode pembanding</div>
+        <div class="value" style="font-size:16px">2017Q2&ndash;2026Q1</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="position:relative;width:100%;height:280px">
+        <canvas id="correlationChart" role="img" aria-label="Grafik dua sumbu membandingkan NDVI lahan pertanian (tertimbang) dengan PDRB Tanaman Pangan ADHK per triwulan">
+          Grafik perbandingan NDVI lahan pertanian dengan PDRB Tanaman Pangan.
+        </canvas>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--ink-soft)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--ndvi)"></span>NDVI lahan pertanian, tertimbang (kiri)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:var(--navy);border-top:2px dashed var(--navy)"></span>PDRB Tanaman Pangan, ADHK (kanan)</span>
+      </div>
+    </div>
+    <div class="note-box" style="margin-top:16px">
+      <strong>Catatan interpretasi.</strong> Korelasi 0,47 tergolong &ldquo;sedang&rdquo;&mdash;cukup
+      untuk menjadi salah satu petunjuk awal, namun belum dapat menggantikan survei resmi.
+      Masking ke lahan pertanian (ESA WorldCover, snapshot 2021) meningkatkan korelasi dari
+      0,31 menjadi 0,47, menunjukkan pentingnya menyaring area yang relevan sebelum menghitung
+      indeks. Selengkapnya lihat artikel pendamping proyek ini.
+    </div>
+  </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/ndvi.js"></script>
+</body>
+</html>

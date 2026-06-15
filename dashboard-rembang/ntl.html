@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NTL &mdash; SIMAK Rembang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="topbar"></div>
+
+<div class="page">
+  <div class="hero">
+    <div class="eyebrow" style="color:var(--ntl)">NTL &middot; Nighttime Light</div>
+    <h1>Cahaya malam sebagai proksi aktivitas ekonomi relatif</h1>
+    <p>
+      NTL mengukur intensitas cahaya buatan yang terdeteksi satelit VIIRS pada malam hari.
+      Peta menunjukkan <em>ntl_relative</em>&mdash;rasio cahaya suatu kecamatan terhadap
+      rata-rata kabupaten&mdash;sehingga kecamatan dengan aktivitas di atas rata-rata
+      tampak lebih terang. Periode dengan kualitas data rendah (banyak nilai nol serempak,
+      umumnya Januari&ndash;Maret) telah disaring dan ditandai.
+    </p>
+  </div>
+
+  <!-- ============================== PETA ============================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Peta NTL relatif per kecamatan</h2>
+      <span class="note" id="periodLabel"></span>
+    </div>
+    <div class="card">
+      <div class="controls">
+        <label>Periode</label>
+        <input type="range" id="periodSlider" min="0" max="0" value="0" style="flex:1;min-width:160px">
+      </div>
+      <div class="map-wrap">
+        <div>
+          <div id="map"></div>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div>
+          <div class="tooltip-box" id="tooltip">Arahkan kursor ke kecamatan untuk melihat nilai</div>
+          <table class="rank" style="margin-top:12px">
+            <thead><tr><th>Kecamatan</th><th class="num">NTL relatif</th></tr></thead>
+            <tbody id="rankTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================== TREN ============================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Tren NTL relatif per kecamatan, 2014&ndash;2026</h2>
+      <span class="note">Hanya periode dengan kualitas data baik</span>
+    </div>
+    <div class="card">
+      <div class="controls">
+        <label>Kecamatan</label>
+        <select id="kecSelect"></select>
+      </div>
+      <div style="position:relative;width:100%;height:280px">
+        <canvas id="trendChart" role="img" aria-label="Grafik garis NTL relatif triwulanan kecamatan terpilih dari 2014 hingga 2026">
+          Grafik tren NTL relatif triwulanan.
+        </canvas>
+      </div>
+      <p style="font-size:12px;color:var(--ink-soft);margin-top:8px">
+        Garis putus-putus (nilai = 1,0) menandai rata-rata kabupaten. Nilai di atas 1,0 berarti
+        kecamatan tersebut lebih terang dari rata-rata; di bawah 1,0 berarti lebih redup.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================== KORELASI ============================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Perbandingan dengan PDRB Total</h2>
+    </div>
+    <div class="grid cols-3" style="margin-bottom:16px">
+      <div class="metric">
+        <div class="label">Korelasi level &mdash; NTL vs PDRB Total</div>
+        <div class="value">0,86</div>
+      </div>
+      <div class="metric">
+        <div class="label">Korelasi growth &mdash; NTL vs PDRB Total</div>
+        <div class="value">0,07</div>
+      </div>
+      <div class="metric">
+        <div class="label">Periode pembanding</div>
+        <div class="value" style="font-size:16px">2014Q1&ndash;2025Q4</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="position:relative;width:100%;height:280px">
+        <canvas id="correlationChart" role="img" aria-label="Grafik dua sumbu membandingkan NTL rata-rata kabupaten dengan PDRB Total ADHB per triwulan">
+          Grafik perbandingan NTL kabupaten dengan PDRB Total.
+        </canvas>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--ink-soft)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--ntl)"></span>NTL rata-rata kabupaten (kiri)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:var(--navy);border-top:2px dashed var(--navy)"></span>PDRB Total, ADHB (kanan)</span>
+      </div>
+    </div>
+    <div class="note-box" style="margin-top:16px">
+      <strong>Catatan interpretasi.</strong> Korelasi level yang tinggi (0,86) sebagian besar
+      mencerminkan tren bersama jangka panjang (keduanya naik dari tahun ke tahun). Korelasi
+      growth yang sangat rendah (0,07) menunjukkan NTL <em>belum</em> dapat dipakai untuk
+      memperkirakan kenaikan/penurunan PDRB antar triwulan&mdash;NTL lebih cocok untuk
+      perbandingan level/peringkat antar kecamatan pada satu waktu, seperti peta di atas.
+    </div>
+  </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/ntl.js"></script>
+</body>
+</html>
