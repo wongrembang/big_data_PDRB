@@ -127,12 +127,13 @@ function renderGalianTrend() {
       ]
     },
     options: { responsive:true, maintainAspectRatio:false,
+      layout: { padding: { top: 16 } },
       plugins:{legend:{display:false}},
       scales:{
         x:{ticks:{autoSkip:true,maxTicksLimit:12,maxRotation:45}},
-        y:{title:{display:true,text:"BSI mean"}},
+        y:{title:{display:true,text:"BSI mean"}, beginAtZero:false},
         y1:{type:"linear",position:"right",title:{display:true,text:"BSI frac"},
-            grid:{drawOnChartArea:false},min:0,max:0.5}
+            grid:{drawOnChartArea:false},min:0,max:0.6}
       }
     }
   });
@@ -300,10 +301,11 @@ function renderKonstruksiTrend() {
       ]
     },
     options:{ responsive:true, maintainAspectRatio:false,
+      layout: { padding: { top: 16 } },
       plugins:{legend:{display:false}},
       scales:{
         x:{ticks:{autoSkip:true,maxTicksLimit:12,maxRotation:45}},
-        y:{title:{display:true,text:"Nilai indeks"}}
+        y:{title:{display:true,text:"Nilai indeks"}, beginAtZero:false}
       }
     }
   });
