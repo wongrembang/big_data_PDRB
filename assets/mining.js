@@ -127,13 +127,14 @@ function renderGalianTrend() {
       ]
     },
     options: { responsive:true, maintainAspectRatio:false,
-      layout: { padding: { top: 16 } },
-      plugins:{legend:{display:false}},
+      layout: { padding: { top: 20, bottom: 8 } },
+      plugins:{ legend:{display:false}, tooltip:{mode:"index",intersect:false} },
       scales:{
         x:{ticks:{autoSkip:true,maxTicksLimit:12,maxRotation:45}},
-        y:{title:{display:true,text:"BSI mean"}, beginAtZero:false},
-        y1:{type:"linear",position:"right",title:{display:true,text:"BSI frac"},
-            grid:{drawOnChartArea:false},min:0,max:0.6}
+        y:{ title:{display:true,text:"BSI mean"}, min:-0.28, max:0.24,
+            ticks:{ callback: v => v.toFixed(2) } },
+        y1:{ type:"linear", position:"right", title:{display:true,text:"BSI frac"},
+             grid:{drawOnChartArea:false}, min:0, max:1.1 }
       }
     }
   });
