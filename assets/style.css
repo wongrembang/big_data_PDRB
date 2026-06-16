@@ -342,6 +342,12 @@ footer {
   gap: 8px;
 }
 
+/* Chart containers - pastikan tidak terpotong */
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
 /* Visually hidden (for chart aria descriptions) */
 .sr-only {
   position: absolute;

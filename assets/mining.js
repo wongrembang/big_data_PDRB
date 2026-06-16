@@ -121,20 +121,27 @@ function renderGalianTrend() {
       labels: rows.map(d => d.periode),
       datasets: [
         { label:"BSI mean", data:rows.map(d=>d.bsi_mean), borderColor:"#BA7517",
-          backgroundColor:"rgba(186,117,23,0.08)", tension:0.15, pointRadius:2, fill:true },
+          backgroundColor:"rgba(186,117,23,0.06)", tension:0.15, pointRadius:3,
+          fill:true, clip: false },
         { label:"BSI high frac", data:rows.map(d=>d.bsi_high_fraction), borderColor:"#993C1D",
-          borderDash:[4,3], tension:0.15, pointRadius:2, fill:false, yAxisID:"y1" },
+          borderDash:[4,3], tension:0.15, pointRadius:2,
+          fill:false, yAxisID:"y1", clip: false },
       ]
     },
-    options: { responsive:true, maintainAspectRatio:false,
-      layout: { padding: { top: 20, bottom: 8 } },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 24, right: 16, bottom: 8, left: 8 } },
       plugins:{ legend:{display:false}, tooltip:{mode:"index",intersect:false} },
       scales:{
-        x:{ticks:{autoSkip:true,maxTicksLimit:12,maxRotation:45}},
-        y:{ title:{display:true,text:"BSI mean"}, min:-0.28, max:0.24,
+        x:{ ticks:{autoSkip:true,maxTicksLimit:12,maxRotation:45} },
+        y:{ title:{display:true,text:"BSI mean"},
+            suggestedMin: -0.28, suggestedMax: 0.24,
             ticks:{ callback: v => v.toFixed(2) } },
-        y1:{ type:"linear", position:"right", title:{display:true,text:"BSI frac"},
-             grid:{drawOnChartArea:false}, min:0, max:1.1 }
+        y1:{ type:"linear", position:"right",
+             title:{display:true,text:"BSI frac"},
+             grid:{drawOnChartArea:false},
+             suggestedMin: 0, suggestedMax: 1.1 }
       }
     }
   });
