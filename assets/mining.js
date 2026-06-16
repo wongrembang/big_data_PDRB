@@ -141,7 +141,7 @@ function renderGalianTrend() {
         y1:{ type:"linear", position:"right",
              title:{display:true,text:"BSI frac"},
              grid:{drawOnChartArea:false},
-             suggestedMin: 0, suggestedMax: 1.1 }
+             min: 0, max: 1.05 }
       }
     }
   });
