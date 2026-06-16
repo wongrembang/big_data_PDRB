@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { href: "ndvi.html", label: "NDVI · Vegetasi" },
   { href: "ntl.html", label: "NTL · Cahaya Malam" },
   { href: "gfw.html", label: "Perikanan Tangkap" },
+  { href: "mining.html", label: "Tambang & Konstruksi" },
 ];
 
 function renderTopbar(activeHref) {

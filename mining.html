@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pertambangan &amp; Konstruksi &mdash; SIMAK Rembang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .tab-bar { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px solid var(--line); }
+  .tab-bar button {
+    font-family:var(--font-body); font-size:13px; font-weight:500;
+    padding:10px 18px; border:none; background:none; cursor:pointer;
+    color:var(--ink-soft); border-bottom:3px solid transparent; margin-bottom:-2px;
+    transition:color .15s, border-color .15s;
+  }
+  .tab-bar button:hover { color:var(--ink); }
+  .tab-bar button.active { color:var(--navy); border-bottom-color:var(--navy); }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+</style>
+</head>
+<body>
+<div id="topbar"></div>
+
+<div class="page">
+  <div class="hero">
+    <div class="eyebrow" style="color:var(--ntl)">Pertambangan &middot; Garam &middot; Konstruksi</div>
+    <h1>Proksi big data untuk sektor sekunder Rembang</h1>
+    <p>
+      Tiga indikator satelit untuk tiga subsektor: Bare Soil Index (galian C/batu kapur),
+      SAR Sentinel-1 (tambak garam), dan NDBI (konstruksi). Masing-masing menggunakan
+      pendekatan yang disesuaikan dengan karakteristik fisik setiap sektor.
+    </p>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="active" onclick="switchTab('galian')">⛏ Galian C &amp; Batu Kapur</button>
+    <button onclick="switchTab('garam')">🧂 Tambak Garam</button>
+    <button onclick="switchTab('konstruksi')">🏗 Konstruksi</button>
+  </div>
+
+  <!-- ===================================================================
+       TAB 1: GALIAN C (BSI)
+  =================================================================== -->
+  <div id="tab-galian" class="tab-panel active">
+    <div class="grid cols-3" style="margin-bottom:16px">
+      <div class="metric">
+        <div class="label">Korelasi growth BSI vs PDRB Pertambangan</div>
+        <div class="value">+0.38</div>
+        <div class="delta up">kec. fokus: Gunem, Sale, Bulu, Sedan, Sarang</div>
+      </div>
+      <div class="metric">
+        <div class="label">Indikator utama</div>
+        <div class="value" style="font-size:16px">BSI (Bare Soil Index)</div>
+        <div class="delta">(SWIR1+Red−NIR−Blue)/(SWIR1+Red+NIR+Blue)</div>
+      </div>
+      <div class="metric">
+        <div class="label">Periode data</div>
+        <div class="value" style="font-size:16px">2017Q2–2026Q2</div>
+        <div class="delta">37 triwulan × 14 kecamatan</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <h2>Peta BSI per kecamatan</h2>
+        <span class="note" id="galianPeriodLabel"></span>
+      </div>
+      <div class="controls">
+        <label>Periode</label>
+        <input type="range" id="galianSlider" min="0" max="0" value="0" style="flex:1;min-width:160px">
+      </div>
+      <div class="map-wrap">
+        <div>
+          <div id="mapGalian"></div>
+          <div class="legend" id="legendGalian"></div>
+        </div>
+        <div>
+          <div class="tooltip-box" id="tooltipGalian">Arahkan kursor ke kecamatan</div>
+          <table class="rank" style="margin-top:12px">
+            <thead><tr><th>Kecamatan</th><th class="num">BSI</th><th class="num">BSI frac</th></tr></thead>
+            <tbody id="rankGalian"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-head"><h2>Tren BSI per kecamatan</h2></div>
+      <div class="controls">
+        <label>Kecamatan</label>
+        <select id="galianKecSelect"></select>
+      </div>
+      <div style="position:relative;width:100%;height:260px">
+        <canvas id="galianTrendChart" role="img" aria-label="Tren BSI triwulanan kecamatan terpilih"></canvas>
+      </div>
+    </div>
+
+    <div class="note-box" style="margin-top:16px">
+      <strong>Catatan.</strong> BSI tinggi = lebih banyak tanah/batuan terbuka.
+      Nilai positif (> 0,05) kuat mengindikasikan lahan galian aktif, konstruksi,
+      atau area terdegradasi. Korelasi growth 0,38 dengan PDRB Pertambangan
+      (ADHK) menunjukkan sinyal yang moderat — galian C di Rembang cukup
+      terdeteksi dari satelit karena batu kapur berwarna terang dan kontrast
+      dengan vegetasi sekitarnya.
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       TAB 2: TAMBAK GARAM (SAR + NDWI)
+  =================================================================== -->
+  <div id="tab-garam" class="tab-panel">
+    <div class="grid cols-3" style="margin-bottom:16px">
+      <div class="metric">
+        <div class="label">Korelasi SAR VV vs produksi garam riil</div>
+        <div class="value">−0.78</div>
+        <div class="delta up">kec. fokus: Kaliori, Rembang, Lasem</div>
+      </div>
+      <div class="metric">
+        <div class="label">Indikator utama</div>
+        <div class="value" style="font-size:16px">SAR VV (Sentinel-1)</div>
+        <div class="delta">Backscatter rendah = air tenang/tambak aktif</div>
+      </div>
+      <div class="metric">
+        <div class="label">Puncak produksi</div>
+        <div class="value" style="font-size:16px">Q3 (Jul–Sep)</div>
+        <div class="delta">Rata-rata ~78.000 ton (musim kemarau)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <h2>Peta SAR VV per kecamatan</h2>
+        <span class="note" id="garamPeriodLabel"></span>
+      </div>
+      <div class="controls">
+        <label>Periode</label>
+        <input type="range" id="garamSlider" min="0" max="0" value="0" style="flex:1;min-width:160px">
+      </div>
+      <div class="map-wrap">
+        <div>
+          <div id="mapGaram"></div>
+          <div class="legend" id="legendGaram"></div>
+        </div>
+        <div>
+          <div class="tooltip-box" id="tooltipGaram">Arahkan kursor ke kecamatan</div>
+          <table class="rank" style="margin-top:12px">
+            <thead><tr><th>Kecamatan</th><th class="num">SAR VV</th><th class="num">NDWI</th></tr></thead>
+            <tbody id="rankGaram"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-head"><h2>Tren SAR VV &amp; produksi garam per triwulan</h2></div>
+      <div style="position:relative;width:100%;height:260px">
+        <canvas id="garamTrendChart" role="img" aria-label="Tren SAR VV kabupaten (kiri) vs pola musiman produksi garam (kanan)"></canvas>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--ink-soft)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#185FA5"></span>SAR VV median fokus (kiri, nilai lebih rendah = tambak lebih aktif)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:#BA7517;border-top:2px dashed #BA7517"></span>Produksi garam riil (kanan, ton — hanya 2023-2025)</span>
+      </div>
+    </div>
+
+    <div class="note-box" style="margin-top:16px">
+      <strong>Catatan.</strong> SAR VV rendah = permukaan air tenang
+      (tambak garam mengkristal) = produksi tinggi. Korelasi −0,78 dengan
+      data produksi garam DKP Rembang (n=11, 2023–2025). Berbeda dari
+      korelasi dengan PDRB Kategori B yang lemah, karena PDRB B mencampur
+      garam dengan galian C. Perlu data produksi garam tahunan DKP sejak
+      2017 untuk validasi yang lebih kuat.
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       TAB 3: KONSTRUKSI (NDBI + GHSL)
+  =================================================================== -->
+  <div id="tab-konstruksi" class="tab-panel">
+    <div class="grid cols-3" style="margin-bottom:16px">
+      <div class="metric">
+        <div class="label">Korelasi growth NDBI vs PDRB Konstruksi</div>
+        <div class="value" style="color:var(--navy)">+0.72</div>
+        <div class="delta up">Indikator terkuat seluruh eksplorasi ini</div>
+      </div>
+      <div class="metric">
+        <div class="label">Indikator utama</div>
+        <div class="value" style="font-size:16px">NDBI (Sentinel-2)</div>
+        <div class="delta">(SWIR1−NIR)/(SWIR1+NIR) — deteksi area terbangun</div>
+      </div>
+      <div class="metric">
+        <div class="label">Kecamatan paling aktif 2020–2025</div>
+        <div class="value" style="font-size:16px">Pamotan</div>
+        <div class="delta">+115.570 m² area terbangun baru (GHSL)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <h2>Peta NDBI per kecamatan</h2>
+        <span class="note" id="konstruksiPeriodLabel"></span>
+      </div>
+      <div class="controls">
+        <label>Periode</label>
+        <input type="range" id="konstruksiSlider" min="0" max="0" value="0" style="flex:1;min-width:160px">
+      </div>
+      <div class="map-wrap">
+        <div>
+          <div id="mapKonstruksi"></div>
+          <div class="legend" id="legendKonstruksi"></div>
+        </div>
+        <div>
+          <div class="tooltip-box" id="tooltipKonstruksi">Arahkan kursor ke kecamatan</div>
+          <table class="rank" style="margin-top:12px">
+            <thead><tr><th>Kecamatan</th><th class="num">NDBI</th><th class="num">Urban Idx</th></tr></thead>
+            <tbody id="rankKonstruksi"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid cols-2" style="gap:16px;margin-top:16px">
+      <div class="card">
+        <div class="section-head"><h2>Tren NDBI per kecamatan</h2></div>
+        <div class="controls">
+          <label>Kecamatan</label>
+          <select id="konstruksiKecSelect"></select>
+        </div>
+        <div style="position:relative;width:100%;height:240px">
+          <canvas id="konstruksiTrendChart" role="img" aria-label="Tren NDBI triwulanan kecamatan terpilih"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-head"><h2>Pertambahan area terbangun 2020–2025 (GHSL)</h2></div>
+        <div style="position:relative;width:100%;height:280px">
+          <canvas id="ghslDeltaChart" role="img" aria-label="Pertambahan area terbangun GHSL 2020-2025 per kecamatan"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box" style="margin-top:16px">
+      <strong>Catatan.</strong> NDBI growth 0,72 adalah korelasi tertinggi
+      dari seluruh eksplorasi ini. NDBI menangkap perubahan permukaan
+      dari vegetasi ke bahan bangunan (aspal, beton, atap) yang terjadi
+      saat konstruksi aktif. GHSL 5-tahunan menunjukkan akumulasi jangka
+      panjang — lebih berguna untuk peta perkembangan wilayah daripada
+      nowcasting triwulanan.
+    </div>
+  </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/mining.js"></script>
+</body>
+</html>
