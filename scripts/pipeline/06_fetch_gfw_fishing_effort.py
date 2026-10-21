@@ -164,8 +164,10 @@ if __name__ == "__main__":
         # setiap dict punya key = nama dataset (misal
         # "public-global-fishing-effort:v4.0"), berisi list record per
         # kapal/periode dengan field seperti "date", "hours", "lat", "lon".
-        entries = data.get("entries", [])
+        entries = data.get("entries") or []
         for entry_dict in entries:
+            if not isinstance(entry_dict, dict):
+                continue  # API mengembalikan null untuk tahun tanpa data
             for dataset_key, records in entry_dict.items():
                 if isinstance(records, list):
                     for rec in records:
