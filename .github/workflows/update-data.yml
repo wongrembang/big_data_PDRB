@@ -1,0 +1,113 @@
+name: Update data
+
+# Dipicu dari tombol "Update data" di index.html (workflow_dispatch).
+# skip_gee = "true"  -> lewati Google Earth Engine (tahap 01-03); hanya PDRB + GFW (~10 menit)
+# skip_gee = "false" -> update penuh termasuk NDVI/NTL dari GEE (~60 menit)
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_gee:
+        description: "true = lewati tahap Google Earth Engine (01-03)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      SKIP_GEE: ${{ github.event.inputs.skip_gee }}
+      GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+      GFW_API_TOKEN: ${{ secrets.GFW_API_TOKEN }}
+      PYTHONIOENCODING: utf-8
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pandas geopandas shapely earthengine-api requests openpyxl
+
+      - name: Siapkan folder kerja
+        working-directory: scripts/pipeline
+        run: |
+          # CSV yang sudah ada dipakai sebagai input tahap berikutnya
+          cp ../../data/raw/*.csv .
+          SRC="../../data/source/PDRB Kab Rembang triwulanan.xlsx"
+          if [ -f "$SRC" ]; then
+            # skrip 04 membaca nama bergaris bawah, skrip 05 membaca nama berspasi
+            cp "$SRC" "PDRB Kab Rembang triwulanan.xlsx"
+            cp "$SRC" "PDRB_Kab_Rembang_triwulanan.xlsx"
+            echo "HAS_PDRB=true" >> "$GITHUB_ENV"
+          else
+            echo "::warning::data/source/PDRB Kab Rembang triwulanan.xlsx tidak ditemukan - tahap PDRB (04-05) dilewati"
+          fi
+
+      - name: Tahap 01-03 - Google Earth Engine (NDVI & NTL)
+        if: env.SKIP_GEE != 'true'
+        working-directory: scripts/pipeline
+        run: |
+          if [ -z "$GEE_SERVICE_ACCOUNT_KEY" ]; then
+            echo "::error::Secret GEE_SERVICE_ACCOUNT_KEY belum diisi. Isi dulu, atau jalankan dengan Skip GEE."
+            exit 1
+          fi
+          python 01_fetch_satellite_timeseries.py
+          python 02_clean_satellite_timeseries.py
+          python 03_ndvi_cropland_masked.py
+
+      - name: Tahap 04-05 - PDRB resmi BPS
+        if: env.HAS_PDRB == 'true'
+        working-directory: scripts/pipeline
+        run: |
+          python 04_extract_pdrb.py
+          python 05_correlate_ndvi_pdrb.py
+
+      - name: Tahap 06 - Global Fishing Watch
+        if: env.GFW_API_TOKEN != ''
+        working-directory: scripts/pipeline
+        run: python 06_fetch_gfw_fishing_effort.py
+
+      - name: Peringatan GFW dilewati
+        if: env.GFW_API_TOKEN == ''
+        run: echo "::warning::Secret GFW_API_TOKEN belum diisi - tahap GFW (06) dilewati"
+
+      - name: Salin hasil ke data/raw
+        working-directory: scripts/pipeline
+        run: |
+          for f in \
+            timeseries_satelit_cleaned.csv \
+            timeseries_satelit_annual.csv \
+            ndvi_cropland_masked_2017_2026.csv \
+            pdrb_total_triwulanan.csv \
+            pdrb_tanaman_pangan_triwulanan.csv \
+            gfw_fishing_effort_rembang_monthly.csv \
+            gfw_fishing_effort_rembang_raw.csv
+          do
+            if [ -f "$f" ]; then cp "$f" ../../data/raw/; fi
+          done
+
+      - name: Bangun assets/data.js
+        run: python scripts/build_data_js.py
+
+      - name: Commit & push hasil
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/data.js data/raw
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan data."
+          else
+            git commit -m "Update data otomatis ($(date -u +%Y-%m-%d))"
+            git push
+          fi

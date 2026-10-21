@@ -38,7 +38,8 @@ import pandas as pd
 import shapely
 import time
 
-ee.Initialize(project='pdrb-big-data-extraction')
+from ee_init import init as _ee_init
+_ee_init()
 
 # ---------------------------------------------------------------------------
 # 1. Load boundary

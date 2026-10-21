@@ -52,7 +52,8 @@ import time
 # ---------------------------------------------------------------------------
 # 0. INISIALISASI
 # ---------------------------------------------------------------------------
-ee.Initialize(project='pdrb-big-data-extraction')
+from ee_init import init as _ee_init
+_ee_init()
 
 # ---------------------------------------------------------------------------
 # 1. LOAD BOUNDARY POLYGON KECAMATAN

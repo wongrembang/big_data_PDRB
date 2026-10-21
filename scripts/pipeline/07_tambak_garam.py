@@ -61,7 +61,8 @@ import shapely
 import time
 import os
 
-ee.Initialize(project='pdrb-big-data-extraction')
+from ee_init import init as _ee_init
+_ee_init()
 
 # ---------------------------------------------------------------------------
 # 1. Load boundary kecamatan
