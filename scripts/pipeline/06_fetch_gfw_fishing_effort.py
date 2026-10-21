@@ -83,9 +83,14 @@ REMBANG_WATERS_POLYGON = {
 }
 
 # ---------------------------------------------------------------------------
-# 2. Periode - mulai dari 2017 (awal data AIS GFW yang konsisten) s.d. 2026
+# 2. Periode - mulai dari 2017 (awal data AIS GFW yang konsisten) s.d. bulan terakhir yang sudah selesai
 # ---------------------------------------------------------------------------
-def build_periode_list(start_year=2017, end_year=2026, end_month=6):
+from period_util import last_completed_month
+
+END_YEAR, END_MONTH = last_completed_month()
+
+
+def build_periode_list(start_year=2017, end_year=END_YEAR, end_month=END_MONTH):
     periode = []
     for year in range(start_year, end_year + 1):
         max_month = end_month if year == end_year else 12
@@ -145,9 +150,12 @@ if __name__ == "__main__":
     for year in years:
         start_date = f"{year}-01-01"
         end_date = f"{int(year)+1}-01-01"
-        # batasi end_date ke periode terakhir yang diminta (2026-06)
+        # batasi end_date ke awal bulan setelah bulan terakhir yang diminta
         if year == years[-1]:
-            end_date = f"{year}-07-01"
+            if END_MONTH < 12:
+                end_date = f"{year}-{END_MONTH + 1:02d}-01"
+            else:
+                end_date = f"{int(year) + 1}-01-01"
 
         print(f"\n[{year}] Mengambil data...")
         try:

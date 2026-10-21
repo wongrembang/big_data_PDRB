@@ -80,9 +80,14 @@ kec_fc = gdf_to_ee_featurecollection(gdf)
 KECAMATAN_LIST = list(gdf["kecamatan"])
 
 # ---------------------------------------------------------------------------
-# 2. DAFTAR PERIODE TRIWULAN 2010Q1 - 2026Q2
+# 2. DAFTAR PERIODE TRIWULAN 2010Q1 - triwulan terakhir yang sudah selesai
 # ---------------------------------------------------------------------------
-def build_periode_list(start_year=2010, end_year=2026, end_quarter=2):
+from period_util import last_completed_quarter
+
+END_YEAR, END_QUARTER = last_completed_quarter()
+
+
+def build_periode_list(start_year=2010, end_year=END_YEAR, end_quarter=END_QUARTER):
     periode = {}
     quarter_months = {1: ("01-01", "03-31"), 2: ("04-01", "06-30"),
                        3: ("07-01", "09-30"), 4: ("10-01", "12-31")}

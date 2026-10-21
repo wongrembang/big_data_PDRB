@@ -75,9 +75,14 @@ for kec, pct in sorted(cropland_pct_map.items(), key=lambda x: -x[1]):
     print(f"  {kec}: {pct:.1f}%")
 
 # ---------------------------------------------------------------------------
-# 3. Periode (Sentinel-2 era only: 2017Q2 - 2026Q2)
+# 3. Periode (Sentinel-2 era only: 2017Q2 - triwulan terakhir yang sudah selesai)
 # ---------------------------------------------------------------------------
-def build_periode_list(start_year=2017, start_q=2, end_year=2026, end_q=2):
+from period_util import last_completed_quarter
+
+END_YEAR, END_Q = last_completed_quarter()
+
+
+def build_periode_list(start_year=2017, start_q=2, end_year=END_YEAR, end_q=END_Q):
     quarter_months = {1: ("01-01", "03-31"), 2: ("04-01", "06-30"),
                        3: ("07-01", "09-30"), 4: ("10-01", "12-31")}
     periode = {}
