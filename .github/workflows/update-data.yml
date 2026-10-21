@@ -1,10 +1,14 @@
 name: Update data
 
-# Dipicu dari tombol "Update data" di index.html (workflow_dispatch).
+# Dipicu dari tombol "Update data" di index.html (workflow_dispatch)
+# dan otomatis tiap bulan lewat jadwal (schedule) - run terjadwal selalu mode penuh.
 # skip_gee = "true"  -> lewati Google Earth Engine (tahap 01-03); hanya PDRB + GFW (~10 menit)
 # skip_gee = "false" -> update penuh termasuk NDVI/NTL dari GEE (~60 menit)
 
 on:
+  schedule:
+    # Tiap tanggal 5 jam 02.00 WIB (= tanggal 4 jam 19.00 UTC). Mode penuh (GEE + GFW).
+    - cron: "0 19 4 * *"
   workflow_dispatch:
     inputs:
       skip_gee:
