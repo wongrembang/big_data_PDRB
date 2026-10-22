@@ -75,15 +75,19 @@ kec_fc = ee.FeatureCollection(features)
 KECAMATAN_LIST = list(gdf["kecamatan"])
 
 # ---------------------------------------------------------------------------
-# 2. Periode triwulanan 2017Q2-2026Q2
+# 2. Periode triwulanan 2017Q2 - triwulan terakhir yang sudah selesai
 # ---------------------------------------------------------------------------
+from period_util import last_completed_quarter
+
+
 def build_periode_list():
     quarter_months = {1: ("01-01","03-31"), 2: ("04-01","06-30"),
                       3: ("07-01","09-30"), 4: ("10-01","12-31")}
     periode = []
-    for year in range(2017, 2027):
+    end_year, end_q = last_completed_quarter()
+    for year in range(2017, end_year + 1):
         q_start = 2 if year == 2017 else 1
-        q_end = 2 if year == 2026 else 4
+        q_end = end_q if year == end_year else 4
         for q in range(q_start, q_end + 1):
             s, e = quarter_months[q]
             periode.append((f"{year}Q{q}", f"{year}-{s}", f"{year}-{e}", year, q))

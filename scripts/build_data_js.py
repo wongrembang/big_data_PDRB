@@ -113,7 +113,23 @@ geartype_monthly = (
 gfw_geartype_monthly = geartype_monthly.to_dict(orient="records")
 
 # ---------------------------------------------------------------------------
-# 7. Tulis ke data.js
+# 7. Tambang, tambak garam, konstruksi (dipakai assets/mining.js)
+#    Kolom disalin apa adanya dari CSV hasil skrip pipeline 07, 08, 10.
+# ---------------------------------------------------------------------------
+def csv_records(name):
+    df = load_csv(name)
+    df = df.where(pd.notna(df), None)
+    return df.to_dict(orient="records")
+
+
+tambak_garam = csv_records("tambak_garam_timeseries_2017_2026.csv")
+galian_c = csv_records("galian_c_timeseries_2017_2026.csv")
+ghsl_buildup = csv_records("ghsl_buildup_per_kecamatan.csv")
+ghsl_delta = csv_records("ghsl_delta_buildup_per_kecamatan.csv")
+ndbi = csv_records("ndbi_timeseries_2017_2026.csv")
+
+# ---------------------------------------------------------------------------
+# 8. Tulis ke data.js
 # ---------------------------------------------------------------------------
 output = {
     "geojson": geojson,
@@ -125,6 +141,11 @@ output = {
     "gfwMonthly": gfw_monthly_records,
     "gfwVesselSummary": gfw_vessel_summary,
     "gfwGeartypeMonthly": gfw_geartype_monthly,
+    "tambakGaram": tambak_garam,
+    "galianC": galian_c,
+    "ghslBuildup": ghsl_buildup,
+    "ghslDelta": ghsl_delta,
+    "ndbi": ndbi,
 }
 
 os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
@@ -145,3 +166,8 @@ print(f"  - pdrbTanamanPangan: {len(pdrb_tanaman_pangan)} baris")
 print(f"  - gfwMonthly: {len(gfw_monthly_records)} baris")
 print(f"  - gfwVesselSummary: {len(gfw_vessel_summary)} baris")
 print(f"  - gfwGeartypeMonthly: {len(gfw_geartype_monthly)} baris")
+print(f"  - tambakGaram: {len(tambak_garam)} baris")
+print(f"  - galianC: {len(galian_c)} baris")
+print(f"  - ghslBuildup: {len(ghsl_buildup)} baris")
+print(f"  - ghslDelta: {len(ghsl_delta)} baris")
+print(f"  - ndbi: {len(ndbi)} baris")

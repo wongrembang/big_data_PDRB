@@ -70,6 +70,15 @@ jobs:
           python 02_clean_satellite_timeseries.py
           python 03_ndvi_cropland_masked.py
 
+      - name: Tahap 07, 08, 10 - Tambak garam, galian C, konstruksi (GEE)
+        if: env.SKIP_GEE != 'true'
+        working-directory: scripts/pipeline
+        run: |
+          # melanjutkan dari CSV yang sudah ada, hanya triwulan baru yang diambil
+          python 07_tambak_garam.py
+          python 08_galian_c.py
+          python 10_konstruksi_ghsl.py
+
       - name: Tahap 04-05 - PDRB resmi BPS
         if: env.HAS_PDRB == 'true'
         working-directory: scripts/pipeline
@@ -96,7 +105,12 @@ jobs:
             pdrb_total_triwulanan.csv \
             pdrb_tanaman_pangan_triwulanan.csv \
             gfw_fishing_effort_rembang_monthly.csv \
-            gfw_fishing_effort_rembang_raw.csv
+            gfw_fishing_effort_rembang_raw.csv \
+            tambak_garam_timeseries_2017_2026.csv \
+            galian_c_timeseries_2017_2026.csv \
+            ndbi_timeseries_2017_2026.csv \
+            ghsl_buildup_per_kecamatan.csv \
+            ghsl_delta_buildup_per_kecamatan.csv
           do
             if [ -f "$f" ]; then cp "$f" ../../data/raw/; fi
           done
